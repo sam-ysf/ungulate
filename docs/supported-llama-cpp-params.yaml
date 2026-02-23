@@ -1,0 +1,293 @@
+predict:
+   description: number of tokens to predict (-1 = infinity)
+
+ctx-size:
+   description: size of the prompt context (0 = loaded from model)
+
+batch-size:
+   description: logical maximum batch size
+
+ubatch-size:
+   description: physical maximum batch size
+
+parallel:
+   description: number of parallel sequences to decode
+
+warmup:
+   description: skip warming up the model with an empty run
+
+threads:
+   description: number of threads to use during generation
+
+threads-batch:
+   description: number of threads to use during batch and prompt processing
+
+cpu-mask:
+   description: CPU affinity mask: arbitrarily long hex. Complements cpu-range
+
+cpu-range:
+   description: range of CPUs for affinity. Complements cpu-mask
+
+cpu-strict:
+   description: use strict CPU placement
+
+prio:
+   description: set process/thread priority:
+   hints:
+      - low(-1)
+      - normal(0)
+      - medium(1)
+      - high(2)
+      - realtime(3)
+
+poll:
+   description: use polling level to wait for work (0 - no polling)
+
+cpu-mask-batch:
+   description: CPU affinity mask: arbitrarily long hex. Complements cpu-range-batch
+
+cpu-range-batch:
+   description: ranges of CPUs for affinity. Complements cpu-mask-batch (lo-hi)
+
+cpu-strict-batch:
+   definition: use strict CPU placement
+
+prio-batch:
+   description: set process/thread priority:
+   hints:
+      - low(-1)
+      - normal(0)
+      - medium(1)
+      - high(2)
+      - realtime(3)
+
+poll-batch:
+   description: use polling to wait for work (0/1)
+
+lookup-cache-static:
+   description: path to static lookup cache to use for lookup decoding (not updated by generation)
+
+lookup-cache-dynamic:
+   description: path to dynamic lookup cache to use for lookup decoding (updated by generation)
+
+flash-attn:
+   description: Flash Attention use
+   hints:
+      - on
+      - off
+      - auto
+
+samplers:
+   description: samplers that will be used for generation in the order, separated by \';\'
+
+seed:
+   description: RNG seed
+
+sampling-seq:
+   description: simplified sequence for samplers that will be used
+
+ignore-eos:
+   description: ignore end of stream token and continue generating (implies logit-bias EOS-inf)
+
+temp:
+   description: temperature
+
+top-k:
+   description: top-k sampling (0 = disabled)
+
+top-p:
+   description: top-p sampling (1.0 = disabled)
+
+min-p:
+   description:min-p sampling (0.0 = disabled)
+
+top-nsigma:
+   description: top-n-sigma sampling (-1.0 = disabled)
+
+xtc-probability:
+   description: xtc probability (0.0 = disabled)
+
+xtc-threshold:
+   description: xtc threshold (1.0 = disabled)
+
+typical:
+   description: locally typical sampling, parameter p (1.0 = disabled)
+
+repeat-last-n:
+   description: last n tokens to consider for penalize (0 = disabled, -1 = ctx-size)
+
+repeat-penalty:
+   description: penalize repeat sequence of tokens (1.0 = disabled)
+
+presence-penalty:
+   description: repeat alpha presence penalty (0.0 = disabled)
+
+frequency-penalty:
+   description: repeat alpha frequency penalty (0.0 = disabled)
+
+dry-multiplier:
+   description: set DRY sampling multiplier (0.0 = disabled)
+
+dry-base:
+   description: set DRY sampling base value
+
+dry-allowed-length:
+   description: set allowed length for DRY sampling
+
+dry-penalty-last-n:
+   description: set DRY penalty for the last n tokens (0 = disable, -1 = ctx-size)
+
+dry-sequence-breaker:
+   description: add sequence breaker for DRY sampling, clearing out default breakers () in the process; use "none" to not use any sequence breakers
+
+dynatemp-range:
+   description: dynamic temperature range (0.0 = disabled)
+
+dynatemp-exp:
+   description: dynamic temperature exponent
+
+mirostat:
+   description: use Mirostat sampling. Top K, Nucleus and Locally Typical samplers are ignored if used. (0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)
+
+mirostat-lr:
+   description: Mirostat learning rate, parameter eta
+
+mirostat-ent:
+   description: Mirostat target entropy, parameter tau
+
+logit-bias:
+   description: modifies the likelihood of token appearing in the completion, i.e. `logit-bias: "15043+1"` to increase likelihood of token 'Hello', or `logit-bias: "15043-1"` to decrease likelihood of token 'Hello'
+
+grammar:
+   description: BNF-like grammar to constrain generations
+
+grammar-file:
+   description: file to read grammar from
+
+pooling:
+   description: pooling type for embeddings, uses model default if unspecified
+   hints:
+      - none
+      - mean
+      - cls
+      - last
+      - rank
+
+attention:
+   description: attention type for embeddings, uses model default if unspecified
+   hints:
+      - causal
+      - non-causal
+
+rope-scaling:
+   description: RoPE frequency scaling method, defaults to linear unless specified by the model
+   hints:
+      - none
+      - linear
+      - yarn
+
+rope-freq-base:
+   description: RoPE base frequency, used by NTK-aware scaling (default: loaded from model)
+
+rope-scale:
+   description: RoPE context scaling factor, expands context by a factor of N
+
+rope-freq-scale:
+   description: RoPE frequency scaling factor, expands context by a factor of 1/N
+
+yarn-ext-factor:
+   description: YaRN: extrapolation mix factor (0.0 = full interpolation)
+
+yarn-attn-factor:
+   description: YaRN: scale sqrt(t) or attention magnitude
+
+yarn-beta-slow:
+   description: YaRN: high correction dim or alpha
+
+yarn-beta-fast:
+   description: YaRN: low correction dim or beta
+
+yarn-orig-ctx:
+   description: YaRN: original context size of model (model training context size)
+
+libllama-verbose-perfomance:
+   description: disable internal libllama performance timings
+
+op-offload:
+   description: disable offloading host tensor operations to device
+
+swa-full:
+   description: use full-size SWA cache
+
+kv-unified:
+   description: use single unified KV buffer for the KV cache of all sequences
+
+kv-offload:
+   description: disable KV offload
+
+cache-type-k:
+   description: KV cache data type for K
+
+cache-type-v:
+   description: KV cache data type for V
+
+no-mmap:
+   description: do not memory-map model (slower load but may reduce pageouts if not using mlock)
+
+mlock:
+   description: force system to keep model in RAM rather than swapping or compressing
+   
+device:
+   description: comma-separated list of devices to use for offloading (none = don't offload)
+
+cpu-moe:
+   description: keep all Mixture of Experts (MoE) weights in the CPU
+
+n-cpu-moe:
+   description: keep the Mixture of Experts (MoE) weights of the first N layers in the CPU
+
+n-gpu-layers:
+   description: max. number of layers to store in VRAM
+
+split-mode:
+   descripton: how to split the model across multiple GPUs
+   hints:
+      - none: use one GPU only
+      - layer: split layers and KV accross GPUs
+      - row: split rows across GPUs
+
+tensor-split:
+   description: fraction of the model to offload to each GPU (takes comma-separated list of proportions; example: "3,1")
+
+main-gpu:
+   description: the GPU to use for the model (with split-mode = none), or for intermediate results and KV (with split-mode = row)
+
+check-tensors:
+   description: check model tensor data for invalid values
+
+no-repack:
+   description: disable weight repacking
+
+override-kv:
+   description: advanced option to override model metadata by key (may be specified multiple times). Metadata types: int, float, bool, str; example: "tokenizer.ggml.add_bos_token=bool:false"
+
+override-tensor:
+   description: override tensor buffer type
+
+cls-separator:
+   description: separator of classification sequences (example: \<#seq#>\)
+
+chat-template:
+   description: overrides default chat template
+
+chat-template-kwargs:
+   description: sets additional params for the json template parser,
+
+verbosity:
+   description: the verbosity level for logging (default: info), where higher verbosity levels prints all levels above it and ignores all levels below it
+   hints:
+      - 0: no logging 
+      - 1: debug 
+      - 2: info 
+      - 3: warnings 
+      - 4: errors

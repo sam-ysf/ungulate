@@ -1,0 +1,24 @@
+{
+  "ocr": [
+    {
+      "gguf": "/path/to/Qwen3.5/Qwen3.5-9B-Q4_K_M.gguf",
+      "mmproj": "/path/to/mmproj-F16.gguf",
+      "description": "Qwen3.5",
+      "prompt": "Convert this image to Markdown.",
+      "params": {
+        "ctx-size": "40960"
+      }
+    }
+  ],
+  "embeddings": [
+    {
+      "gguf": "/path/to/embedding/model",
+      "chunks": [
+        "(.+)"
+      ],
+      "params": {
+        "ctx-size": "40960"
+      }
+    }
+  ]
+}
