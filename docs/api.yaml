@@ -1,0 +1,274 @@
+openapi: 3.0.2
+
+info:
+  title: Search Query API
+  description: Endpoints for interfacing with search engine
+  version: 1.0.0
+
+paths:
+  /model/list:
+    post:
+      responses:
+        "200":
+          description: List of models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Model"
+
+  /file/list:
+    post:
+      responses:
+        "200":
+          description: List of files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/File"
+
+  /file/get:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: integer
+      responses:
+        "200":
+          description: Parsed file contents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /file/get/original:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: integer
+      responses:
+        "200":
+          description: Original file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /file/delete:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: integer
+      responses:
+        "200":
+          description: File successfully deleted
+
+  /file/new:
+    post:
+      requestBody:
+        required: true
+        description: multipart/form-data containing file stream
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  title: File Contents
+              mime_type:
+                type: string
+                description: application/octet-stream
+      responses:
+        "200":
+          description: File parse successfully started
+
+  /file/embeddings:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: integer
+      responses:
+        "200":
+          description: File embeddings calculation successfully started
+
+  /file/embeddings/download:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: integer
+      responses:
+        "200":
+          description: Calculated file embeddings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    embeddings:
+                      type: array
+                      items:
+                        type: number
+                    model:
+                      type: string
+                    page:
+                      type: integer
+
+  /file/pause:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: integer
+      responses:
+        "200":
+          description: File processing sucessfully paused
+
+  /search:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchQuery"
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pages:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/SearchResult"
+
+components:
+  schemas:
+    Model:
+      type: object
+      properties:
+        model:
+          type: string
+        description:
+          type: string
+        enabled:
+          type: boolean
+        configured:
+          type: boolean
+
+    File:
+      type: object
+      properties:
+        uuid:
+          type: integer
+        model:
+          type: string
+        prompt:
+          type: string
+        name:
+          type: string
+        n-pages:
+          type: integer
+        n-pages-indexed:
+          type: integer
+        request-type:
+          type: string
+        stopping:
+          type: boolean
+        metadata:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+        n-embeddings:
+          type: integer
+        n-embeddings-indexed:
+          type: integer
+
+    SearchResult:
+      type: object
+      properties:
+        file-uuid:
+          type: integer
+        file-name:
+          type: string
+        model:
+          type: string
+        page-id-in-file:
+          type: integer
+        phrase-count:
+          type: integer
+        snippets:
+          type: array
+          items:
+            type: string
+        rank:
+          type: integer
+
+    SearchQuery:
+      type: object
+      properties:
+        search-type:
+          type: string
+        value:
+          type: string
+        files:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [include, exclude]
+            uuids:
+              type: array
+              items:
+                type: integer

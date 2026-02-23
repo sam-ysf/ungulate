@@ -1,0 +1,7 @@
+dependencies:
+  cpp-httplib:
+    url: https://github.com/yhirose/cpp-httplib
+  llama.cpp:
+    url: https://github.com/ggml-org/llama.cpp
+  sqlite-vec:
+    url: https://github.com/asg017/sqlite-vec

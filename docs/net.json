@@ -1,0 +1,4 @@
+{
+  "dashboard-port": "6767",
+  "query-port": "6969"
+}
