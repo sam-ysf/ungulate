@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (() => {
+        const url = "/runtime-config/config.jsx";
+        const script = document.createElement("script");
+        script.src = url;
+
+        script.onerror = () => {
+          // Fallback to defaults if configuration script not found
+          globalThis.__RUNTIME_CONFIG__ = {
+            API_PORT: 6868,
+            API_URL: "127.0.0.1",
+          };
+        };
+
+        document.head.appendChild(script);
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Engine Client</title>
+    <script type="module" crossorigin src="/assets/index-CkjjPF3g.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C36mRYAn.css">
+  </head>
+  <body class="background h-100">
+    <div id="root"></div>
+  </body>
+</html>
