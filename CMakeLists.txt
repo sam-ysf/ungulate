@@ -86,4 +86,7 @@ target_link_libraries(${Elf_name} LINK_PUBLIC ssl)
 install(FILES
   ${CMAKE_CURRENT_LIST_DIR}/plugins/vec0.so
   DESTINATION /usr/local/share/ungulate/plugins)
+install(DIRECTORY
+  ${CMAKE_CURRENT_LIST_DIR}/client
+  DESTINATION /usr/local/share/ungulate)
 install(TARGETS ${Elf_name} DESTINATION bin)
