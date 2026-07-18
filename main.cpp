@@ -4,6 +4,7 @@
 #include "file/misc_utils.hpp"
 #include "file/schema.hpp"
 #include "file_index_runner.hpp"
+#include "llm/file_utils.hpp"
 #include "log/log.hpp"
 #include "query_server_runner.hpp"
 #include <csignal>
@@ -107,6 +108,17 @@ namespace {
             }
         }
 
+        // Control panel
+        const std::vector<std::string> dashboard_paths = {
+            "/usr/local/share/ungulate/client", "/usr/share/ungulate/client"};
+
+        for (const std::string& path: dashboard_paths) {
+            if (std::filesystem::exists(path)) {
+                env["dashboard-dir"] = path;
+                break;
+            }
+        }
+
         // Home directory is default directory
         env["config-dir"] = default_config_dir;
 
@@ -163,6 +175,51 @@ namespace {
         }
 
         return true;
+    }
+
+    // Loads control panel
+    std::unique_ptr<app::DashboardServer> initialize_dashboard_server(
+        const util::Config& config,
+        const std::string& dashboard_dir)
+    {
+        if (!std::filesystem::exists(dashboard_dir)) {
+            return nullptr;
+        }
+
+        const std::optional<std::string> runtime_config_dirpath
+            = util::file::maybe_create_temp_workdir();
+        if (!runtime_config_dirpath) {
+            return nullptr;
+        }
+
+        const auto query_port = config["query-port"];
+        if (!query_port) {
+            return nullptr;
+        }
+
+        const std::string runtime_config = std::format(
+            R"(globalThis.__RUNTIME_CONFIG__={{API_PORT:{},API_URL:"127.0.0.1"}})",
+            query_port.value());
+        const std::filesystem::path runtime_config_path
+            = std::filesystem::path(runtime_config_dirpath.value())
+              / "config.jsx";
+        util::file::fs_write_file(runtime_config_path, runtime_config);
+
+        auto dashboard_server = std::make_unique<app::DashboardServer>();
+
+        int dashboard_port = std::stoi(config["dashboard-port"].value());
+        if (!dashboard_server->bind(dashboard_port)) {
+            return nullptr;
+        }
+
+        if (!dashboard_server->mount(
+                dashboard_dir, runtime_config_dirpath.value())) {
+            return nullptr;
+        }
+
+        LOG_INF("control panel (http) bound to port %d", dashboard_port);
+
+        return dashboard_server;
     }
 } // namespace
 
@@ -236,15 +293,41 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    std::unique_ptr<app::DashboardServer> dashboard_server;
+    if (config["dashboard-port"]) {
+        if (!env.contains("dashboard-dir")) {
+            return 1;
+        }
+
+        dashboard_server
+            = initialize_dashboard_server(config, env["dashboard-dir"]);
+        if (!dashboard_server) {
+            return 1;
+        }
+    }
+
     auto query_server_worker
         = std::make_unique<std::jthread>([&query_server_runner]() {
         query_server_runner->run();
     });
 
+    std::unique_ptr<std::jthread> dashboard_worker;
+    if (config["dashboard-port"]) {
+        dashboard_worker
+            = std::make_unique<std::jthread>([&dashboard_server]() {
+            dashboard_server->listen();
+        });
+    }
+
     while (true) {
         if (!global_run_state(nullptr)) {
             break;
         }
+    }
+
+    if (config["dashboard-port"]) {
+        dashboard_server->stop();
+        dashboard_worker->join();
     }
 
     query_server_runner->stop();

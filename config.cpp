@@ -293,6 +293,7 @@ namespace {
 } // namespace
 
 namespace {
+    const std::string kDefaultDashboardPort = "6767";
     const std::string kDefaultDbName = "db.sqlite";
     const std::string kDefaultNetworkProtocol = "http";
     const std::string kDefaultQueryPort = "6868";
@@ -364,9 +365,17 @@ namespace {
 
         util::Config config;
         // Default opt.
+        config.global_params["dashboard-port"] = kDefaultDashboardPort;
+        // Default opt.
         config.global_params["network-protocol"] = kDefaultNetworkProtocol;
         // Default opt.
         config.global_params["query-port"] = kDefaultQueryPort;
+
+        auto dashboard_port
+            = maybe_load_field<std::string>("dashboard-port", j);
+        if (dashboard_port && !dashboard_port->empty()) {
+            config.global_params["dashboard-port"] = dashboard_port.value();
+        }
 
         auto network_protocol
             = maybe_load_field<std::string>("network-protocol", j);
@@ -380,7 +389,8 @@ namespace {
         }
 
         // If no existing configuration exists, save defaults to new file
-        if ((!network_protocol || network_protocol->empty())
+        if ((!dashboard_port || dashboard_port->empty())
+            || (!network_protocol || network_protocol->empty())
             || (!query_port || query_port->empty())) {
             save_config(config_dir / "net.json", config.global_params);
         }
