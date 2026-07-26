@@ -1,4 +1,5 @@
 #include "llm/file_utils.hpp"
+#include "llm/gguf_header_parser.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -8,9 +9,11 @@
 #include <ios>
 #include <iterator>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <openssl/evp.h>
 #include <span>
 #include <sstream>
+#include <unordered_map>
 
 namespace {
 
@@ -82,23 +85,11 @@ namespace {
     }
 } // namespace
 
-std::string util::file::fs_calculate_hash(const std::string& path)
+std::string util::file::blob_calculate_hash(const std::string& data)
 {
-    static const int kReadBuffSize = 4194304;
-
     EVP_MD_CTX* ctx = EVP_MD_CTX_new();
     EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr);
-
-    auto buffer = std::make_unique<char[]>(kReadBuffSize);
-    std::ifstream ifs(path, std::ios_base::in);
-    if (!ifs.is_open()) {
-        return std::string();
-    }
-
-    ifs.read(buffer.get(), kReadBuffSize);
-    if (std::int64_t size = ifs.gcount(); size > 0) {
-        EVP_DigestUpdate(ctx, buffer.get(), static_cast<std::size_t>(size));
-    }
+    EVP_DigestUpdate(ctx, data.data(), data.size());
 
     unsigned char digest[32] = {};
     unsigned int digest_len = 0;

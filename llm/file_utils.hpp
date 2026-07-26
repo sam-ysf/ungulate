@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 namespace util::file {
 
@@ -11,7 +10,6 @@ namespace util::file {
         std::string gguf_hash;
     };
 
-    std::string fs_calculate_hash(const std::string& path);
     std::string blob_calculate_hash(const std::string& data);
 
     std::string fs_read_file(const std::string& path);

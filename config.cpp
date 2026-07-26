@@ -1,6 +1,7 @@
 #include "config.hpp"
 #include "llm/configs.hpp"
 #include "llm/file_utils.hpp"
+#include "llm/gguf_header_parser.hpp"
 #include "log/log.hpp"
 #include <algorithm>
 #include <dirent.h>
@@ -103,6 +104,17 @@ namespace {
             j.value());
     }
 
+    std::optional<std::unordered_map<std::string, std::string>>
+    parse_gguf_metadata(const std::string& path)
+    {
+        util::file::GgufHeaderParser parser;
+        if (!parser.init(path) || !parser.parse()) {
+            return std::nullopt;
+        }
+
+        return parser.get_metadata();
+    }
+
     /*! Helper, config load
      */
     template <>
@@ -147,9 +159,16 @@ namespace {
                 return std::nullopt;
             }
 
-            LOG_INF("calculating %s checksum", gguf.value().c_str());
+            std::optional<std::unordered_map<std::string, std::string>> metadata
+                = parse_gguf_metadata(gguf.value());
+            if (!metadata) {
+                return std::nullopt;
+            }
 
-            std::string hash = util::file::fs_calculate_hash(gguf.value());
+            std::string hash = util::file::blob_calculate_hash(
+                nlohmann::json(metadata.value()).dump());
+
+            LOG_INF("Found model %s", gguf.value().c_str());
 
             value.push_back(
                 util::file::OcrModelConfig{
@@ -157,7 +176,8 @@ namespace {
                     .gguf_hash = hash,
                     .mmproj = mmproj.value(),
                     .prompt = prompt.value(),
-                    .description = description.value_or(std::string()),
+                    .description
+                    = description.value_or((metadata.value())["general.name"]),
                     .enabled = enabled.value_or(false),
                     .clear_cache = clear_cache.value_or(false),
                     .verbose_parse_result
@@ -208,15 +228,23 @@ namespace {
                 continue;
             }
 
-            LOG_INF("calculating %s checksum", gguf.value().c_str());
+            std::optional<std::unordered_map<std::string, std::string>> metadata
+                = parse_gguf_metadata(gguf.value());
+            if (!metadata) {
+                return std::nullopt;
+            }
 
-            std::string hash = util::file::fs_calculate_hash(gguf.value());
+            std::string hash = util::file::blob_calculate_hash(
+                nlohmann::json(metadata.value()).dump());
+
+            LOG_INF("Found model %s", gguf.value().c_str());
 
             util::file::PostprocessingConfig v
                 = {.gguf = gguf.value(),
                    .gguf_hash = hash,
                    .prompt = prompt.value(),
-                   .description = description.value_or(std::string()),
+                   .description
+                   = description.value_or((metadata.value())["general.name"]),
                    .enabled = enabled.value_or(false),
                    .clear_cache = clear_cache.value_or(false),
                    .params = params.value_or(
@@ -270,15 +298,23 @@ namespace {
                 continue;
             }
 
-            LOG_INF("calculating %s checksum", gguf.value().c_str());
+            std::optional<std::unordered_map<std::string, std::string>> metadata
+                = parse_gguf_metadata(gguf.value());
+            if (!metadata) {
+                return std::nullopt;
+            }
 
-            std::string hash = util::file::fs_calculate_hash(gguf.value());
+            std::string hash = util::file::blob_calculate_hash(
+                nlohmann::json(metadata.value()).dump());
+
+            LOG_INF("Found model %s", gguf.value().c_str());
 
             util::file::EmbeddingConfig v
                 = {.gguf = gguf.value(),
                    .gguf_hash = hash,
                    .embeddings_only = embeddings_only.value_or(true),
-                   .description = description.value_or(std::string()),
+                   .description
+                   = description.value_or((metadata.value())["general.name"]),
                    .enabled = enabled.value_or(false),
                    .chunks = expressions.value(),
                    .clear_cache = clear_cache.value_or(false),
