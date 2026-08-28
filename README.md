@@ -12,6 +12,9 @@ This project uses LLM inference to build a vector embedding database that can be
 
 - **Web Interface**: Uses a web-based API for file uploads and search queries
 
+![Local Client](docs/localhost-landing.png)
+![Local Client](docs/localhost-search.png)
+
 ## Building from Source
 
 ### Installing Dependencies
