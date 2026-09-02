@@ -1,0 +1,29 @@
+{
+  "embeddings": [
+    {
+      "chunks": [
+        "(.+)"
+      ],
+      "clear-cache": true,
+      "embeddings-only": true,
+      "enabled": true,
+      "gguf": "/root/.config/ungulate/server/embeddings-model.gguf",
+      "params": {
+        "ctx-size": "40960"
+      }
+    }
+  ],
+  "ocr": [
+    {
+      "clear-cache": false,
+      "enabled": false,
+      "gguf": "/root/.config/ungulate/server/ocr-model.gguf",
+      "mmproj": "/root/.config/ungulate/server/ocr-mmproj-f16.gguf",
+      "params": {
+        "ctx-size": "40960"
+      },
+      "prompt": "Read this image naturally and convert it to Markdown. Preserve whitespace and structural elements.",
+      "verbose-parse-result": true
+    }
+  ]
+}

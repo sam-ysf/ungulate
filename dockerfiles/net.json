@@ -1,0 +1,5 @@
+{
+  "dashboard-port": "6767",
+  "network-protocol": "http",
+  "query-port": "6868"
+}
