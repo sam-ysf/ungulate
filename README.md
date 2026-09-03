@@ -12,6 +12,16 @@ This project uses LLM inference to build a vector embedding database that can be
 
 - **Web Interface**: Uses a web-based API for file uploads and search queries
 
+## Docker Container
+
+This project can be run with Docker, provided that NVIDIA drivers are installed on the base machine along with the NVIDIA container toolkit.
+
+```Bash
+docker pull samysf/ungulate
+docker volume create ungulate_data
+docker run -it --rm -p 6767:6767 -p 6868:6868 -v ungulate_data:/root/.config/ungulate/server --gpus all samysf/ungulate:latest
+```
+
 ![Local Client](docs/localhost-landing.png)
 ![Local Client](docs/localhost-search.png)
 
