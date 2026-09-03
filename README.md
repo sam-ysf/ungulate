@@ -14,7 +14,7 @@ This project uses LLM inference to build a vector embedding database that can be
 
 ## Docker Container
 
-This project can be run with Docker, provided that NVIDIA drivers are installed on the base machine along with the NVIDIA container toolkit.
+This project can be run with Docker, provided that NVIDIA drivers are installed on the base machine along with the [NVIDIA container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
 
 ```Bash
 docker pull samysf/ungulate
